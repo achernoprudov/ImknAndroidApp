@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Imkn Android App</string>
+    <string name="action_settings">Settings</string>
+    <string name="posts_title">IMKN Posts</string>
+</resources>
