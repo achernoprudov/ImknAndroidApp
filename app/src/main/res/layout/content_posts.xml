@@ -9,9 +9,16 @@
     tools:context="ru.naumen.imkn.ui.activity.PostsActivity"
     tools:showIn="@layout/activity_posts">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/posts"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/posts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

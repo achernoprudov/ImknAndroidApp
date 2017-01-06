@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,31 +11,14 @@ import java.util.List;
 
 import ru.naumen.imkn.R;
 import ru.naumen.imkn.model.Post;
+import ru.naumen.imkn.ui.activity.PostActivity;
+import ru.naumen.imkn.ui.holder.PostHolder;
 
 /**
  * @author achernoprudov
  * @since 06 January 2017
  */
-
-public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostHolder> {
-
-    class PostHolder extends RecyclerView.ViewHolder {
-
-        PostHolder(View itemView) {
-            super(itemView);
-        }
-
-        void bindPost(Post post) {
-            TextView titleView = (TextView) itemView.findViewById(R.id.title);
-            titleView.setText(post.getTitle());
-
-            TextView textView = (TextView) itemView.findViewById(R.id.text);
-            textView.setText(post.getText());
-
-            TextView dateView = (TextView) itemView.findViewById(R.id.date);
-            dateView.setText(post.getDate().toString());
-        }
-    }
+public class PostsAdapter extends RecyclerView.Adapter<PostHolder> {
 
     private List<Post> mPosts = new ArrayList<>();
 
@@ -49,13 +31,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostHolder> 
 
     @Override
     public void onBindViewHolder(PostHolder holder, int position) {
-        Post post = mPosts.get(position);
+        final Post post = mPosts.get(position);
         holder.bindPost(post);
-    }
 
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+        // хэндлер для перехода на активити по клику
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PostActivity.startActivity(view.getContext(), post.getId());
+            }
+        });
     }
 
     @Override
@@ -67,10 +52,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostHolder> 
         mPosts.addAll(posts);
     }
 
-    /**
-     * Отдельный метод из-за кнопки "показать еще"
-     */
-    public int getPostsCount() {
-        return mPosts.size();
+    public void clear() {
+        mPosts.clear();
     }
 }

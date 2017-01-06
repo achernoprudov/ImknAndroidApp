@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -25,6 +26,12 @@ import ru.naumen.imkn.model.Post;
 public final class ParseUtils {
 
     private static final String TAG = "ParseUtils";
+
+    private static final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
+
+    public static String dateToString(Date date) {
+        return mSimpleDateFormat.format(date);
+    }
 
     /**
      * @param inputStream поток с сервера

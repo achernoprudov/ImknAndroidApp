@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,13 +38,7 @@ public class PostsActivity extends AppCompatActivity {
      */
     public class GetPostsTask extends AsyncTask<Void, Void, Collection<Post>> {
 
-        private static final String REST_ADDRESS_FORMAT = "%s/rest/posts/?first_result=%d%n";
-
-        private final long mFirstResult;
-
-        GetPostsTask(int firstResult) {
-            mFirstResult = firstResult;
-        }
+        private static final String REST_ADDRESS_FORMAT = "%s/rest/posts";
 
         /**
          * Действия, которые происходят в бэкграунд потоке приложения.
@@ -52,7 +47,7 @@ public class PostsActivity extends AppCompatActivity {
         protected Collection<Post> doInBackground(Void... voids) {
             try {
                 // формируем адрес до REST API метода
-                String restAddress = String.format(REST_ADDRESS_FORMAT, Constants.HOST_ADDRESS, mFirstResult);
+                String restAddress = String.format(REST_ADDRESS_FORMAT, Constants.HOST_ADDRESS);
                 URL url = new URL(restAddress);
                 Log.i(TAG, "Request address: " + restAddress);
 
@@ -93,13 +88,14 @@ public class PostsActivity extends AppCompatActivity {
             // выполняется в UI потоке, поэтому мы можем спокойно работать с UI
             mPostsAdapter.addItems(posts);
             mPostsAdapter.notifyDataSetChanged();
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
     private static final String TAG = "PostsActivity";
 
     private PostsAdapter mPostsAdapter;
-    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private FloatingActionButton mFloatingActionButton;
 
     @Override
@@ -109,6 +105,7 @@ public class PostsActivity extends AppCompatActivity {
         addCreatePostButton();
         setupToolbar();
         setupRecyclerView();
+        setupSwipeToRefreshAction();
 
         loadPosts();
     }
@@ -118,26 +115,43 @@ public class PostsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    /**
+     * Загружает посты
+     */
     private void loadPosts() {
-        int firstResult = mPostsAdapter.getPostsCount();
-        new GetPostsTask(firstResult).execute();
+        new GetPostsTask().execute();
     }
 
     private void setupRecyclerView() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.posts);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.posts);
 
         // RecyclerView требует как адаптер, так и LayoutManager
         mPostsAdapter = new PostsAdapter();
-        mRecyclerView.setAdapter(mPostsAdapter);
+        recyclerView.setAdapter(mPostsAdapter);
 
         // LayoutManager отвечает за расположение элементов в списке
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayout.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(layoutManager);
 
         // добавление разделителя элементов
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    /**
+     * Добавление swipe to refresh экшена
+     */
+    private void setupSwipeToRefreshAction() {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mPostsAdapter.clear();
+                mPostsAdapter.notifyDataSetChanged();
+                loadPosts();
+            }
+        });
     }
 
     /**

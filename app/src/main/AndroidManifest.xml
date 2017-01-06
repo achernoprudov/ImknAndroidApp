@@ -23,6 +23,10 @@
 
         </activity>
 
+        <activity
+            android:name=".ui.activity.PostActivity"
+            android:label="Post" />
+
     </application>
 
 </manifest>
